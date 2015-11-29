@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html ng-app="graphicsApp">
+	<head>
+		<title>CHANGE THIS</title>
+		<link rel = "stylesheet" href = "includes/css/style.css">
+		<script type="text/javascript" src="includes/js/lib/jquery/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="includes/js/lib/angular/angular.min.js"></script>
+		<script type="text/javascript" src="includes/js/BasicDrawing.js"></script>
+		<script type="text/javascript" src="includes/js/LineDrawing.js"></script>
+		<script type="text/javascript" src="includes/js/CircleDrawing.js"></script>
+		<script type="text/javascript" src="includes/js/PolygonDrawing.js"></script>
+		<script type="text/javascript" src="includes/js/CanvasDrawer.js"></script>
+	</head>
+
+	<body ng-controller="mainController">
+		<div class="wrapper">
+			<aside>
+				<button ng-click="ClearCanvas()">Clear</button>
+				<div class="divider" ng-show="model.props"></div>
+				<div class="propertyBlock" ng-repeat="prop in model.props">
+					<label>{{prop.displayName}}:</label>
+					<span ng-show="prop.rangeText" class="propertyRangeText"><input ng-model="prop.model.val"></span>
+					<span>
+						<input class="propertyInput" ng-model="prop.model.val" type="{{prop.type}}" min="{{prop.min}}" max="{{prop.max}}">
+					</span>
+					
+					<!--<output name="test" style="float: right" for="{{prop.id}}"></output>-->
+					<div class="clear"></div>
+				</div>
+				<div class="divider"></div>
+				<div class="colorBlock" ng-repeat="color in model.colors" ng-click="ColorSelect($index)" style="background-color: {{color.color}}; {{color.state}}"></div>
+
+			</aside>
+			<main>
+				<div class="selectorBlock">
+					<button ng-repeat="type in model.types" ng-click="ShapeSelect($index)" style="{{type.state}}">{{type.name}}</button>
+				</div>
+				<div class="divider"></div>
+				<canvas id="canvas" width="710" height="710"></canvas>
+			</main>
+		</div>
+		<script type="text/javascript" src="includes/js/graphicsApp.js"></script>
+	</body>
+</html>

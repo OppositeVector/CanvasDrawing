@@ -1,0 +1,267 @@
+* { margin:0; padding:0 }
+a { text-decoration: none; color: #ffffff; }
+
+header, nav, main, aside, footer, section, article {
+	display:block;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-align: center;
+}
+
+body {
+	background-color: #c3d4e3;
+	color: #ffffff;
+	font-size: 25px;
+	font-family: "calibri";
+}
+
+.wrapper {
+	margin: auto;
+	width: 1020px;
+	color: #ffffff;
+}
+
+.clear {
+	clear: both;
+}
+
+header {
+	font-size: 50px;
+	margin: 10px;
+}
+
+header a {
+	float: right;
+	font-size: 18px;
+	color: #222628;
+}
+
+header a:hover {
+	text-decoration: underline;
+}
+
+header input[type="search"] {
+	display: block;
+	width: 80%;
+	height: 40px;
+	font-size: 0.5em;
+	font-weight: 100;
+	text-align: center;
+	font-family: inherit;
+	float: left;
+}
+
+header button {
+	position: relative;
+	width: 17%;
+	height: 40px;
+	float: right;
+}
+
+header section {
+	margin: 15px;
+}
+
+main {
+	width: 710px;
+	border: 2px solid #5500dd;
+	border-radius: 4px;
+}
+
+canvas {
+	border-top: 2px solid #5500dd;
+	border-bottom: 2px solid #5500dd;;
+}
+
+.divider {
+	margin: 15px;
+	padding: 0px;
+	height: 1px;
+	background-image: url("../images/Divider.png");
+	background-size: 100%;
+}
+
+.selectorBlock {
+	width: 100%;
+	z-index: 10;
+}
+
+.selectorBlock button {
+	width: 200px;
+}
+
+main button {
+	border: 2px outset #b50000;
+	border-radius: 3px;
+	margin: 5px;
+	background-color: #f3c3b2;
+}
+
+main button:hover {
+	background-color: #ffeccf;
+}
+
+main button:active {
+	border-style: inset;
+}
+
+aside {
+	width: 300px;
+	float: right;
+	border: 2px solid #0000ff;
+	border-radius: 3px;
+}
+
+aside button {
+	width: 100%;
+}
+
+.colorBlock {
+	position: relative;
+	width: 25px;
+	height: 25px;
+	margin: 5px;
+	float: left;
+	top: -3px;
+	left: -3px;
+	box-shadow: 5px 5px 5px #000000;
+	border-radius: 4px;
+}
+
+.propertyBlock {
+	font-size: 15px;
+	padding-left: 10px;
+	padding-right: 10px;
+	overflow: hidden;
+}
+
+.propertyInput {
+	width: 100%;
+}
+
+.propertyRangeText {
+	float: right;
+}
+
+.propertyRangeText input {
+	width: 30px;
+}
+
+.propertyBlock label {
+	float: left;
+}
+
+.propertyBlock span {
+	display: block;
+    overflow: hidden;
+    padding-left:5px;
+}
+
+/* Remnants of the previous style */
+/*
+#loadingOverlay {
+
+	height: 100%;
+	width: 100%;
+	background-color: #000000;
+	position: fixed;
+	z-index: 9999;
+	opacity: 0.4;
+
+}
+
+#loadingOverlay canvas {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+}
+
+.clear {
+	clear: both;
+}
+
+main {
+	margin-top: 30px;
+	background-color: #7788dd;
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 2px;
+	padding: 15px;
+}
+
+button.remove {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 19%;
+	background-color: #ec4242;
+	float: right;
+	border-color: #b94040;
+	border-radius: 3px;
+}
+
+button.remove:hover {
+	background-color: #ffa0a0;
+	border-color: #ff2323;
+}
+
+button.remove:active {
+	background-color: #ffa0a0;
+	border-color: #ff2323;
+	border-style: inset;
+}
+
+
+input.upload {
+	margin-left: 330px;
+}
+
+article {
+	background-color: #cdeded;
+	height: 32px;
+	padding: 5px;
+	padding-right: 25px;
+	padding-left: 25px;
+	margin: 6px;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 5px;
+	border-color: #0b4d4c;
+}
+
+article a {
+	width: 79%;
+	height: 100%;
+	color: #0b4d4c;
+}
+
+section {
+
+	padding: 10px;
+	border-style: solid;
+	border-radius: 5px;
+	border-width: 1px;
+
+}
+
+.divider {
+	margin: 15px;
+	padding: 0px;
+	height: 1px;
+	background-image: url("../images/Divider.png");
+	background-size: 100%;
+}
+
+.space {
+	margin-top: 7px;
+	margin-bottom: 7px;
+	height: 1px;
+	background-image: url("../images/LightDivider.png");
+	background-size: 100%;
+}
+
+*/
