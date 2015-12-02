@@ -76,3 +76,51 @@ function RegularPolygon(cp, r, e, au) {
 	}
 
 }
+
+function Polygon(p) {
+
+	var points = [ p ];
+	var pixels = [];
+
+	this.Redraw = function(close) {
+
+		pixels.length = 0;
+		for(var i = 0; i < (points.length - 1); ++i) {
+			pixels = CalculateLine(points[i], points[i+1], pixels);
+		}
+
+		if(close == true) {
+			pixels = CalculateLine(points[0],points[points.length - 1], pixels);
+		}
+
+		// console.log(points);
+		// console.log(pixels);
+
+	}
+
+	this.GetPoint = function(index) {
+		if(index < points.length) {
+			return points[index];
+		}
+	}
+
+	this.AddPoint = function(p) {
+
+		points.push(p);
+		this.Redraw(false);
+
+	}
+
+	this.PointCount = function() {
+		return points.length;
+	}
+
+	this.Close = function(p) {
+		this.Redraw(true);
+	}
+
+	this.pixels = function() {
+		return pixels;
+	}
+
+}

@@ -1,6 +1,5 @@
 // Requires BasicDrawing.js, LineDrawing.js, CircleDrawing.js, PolygonDrawing.js
 
-
 function CanvasDrawer(c) {
 
 	var canvas = c;
@@ -32,7 +31,9 @@ function CanvasDrawer(c) {
 	var currentColor = "#000000";
 	var polyCount = { val: 3 };
 
-	this.types = [
+	var multiClickOperation = false;
+
+	var simpleTypes = [
 		{
 			name: "Line",
 			proto: function(mp, c) {
@@ -42,7 +43,8 @@ function CanvasDrawer(c) {
 				}
 				this.color = ToColor(c); // From BasicDrawing.js
 				drawingObjects.push(this);
-			}
+			},
+			multiClick: false
 		}, {
 			name: "Circle",
 			proto: function(mp, c) {
@@ -56,7 +58,8 @@ function CanvasDrawer(c) {
 				}
 				this.color = ToColor(c); // From BasicDrawing.js
 				drawingObjects.push(this);
-			}
+			},
+			multiClick: false
 		}, {
 			name: "Free Hand",
 			proto: function(mp, c) {
@@ -69,7 +72,8 @@ function CanvasDrawer(c) {
 				}
 				this.color = ToColor(c); // From BasicDrawing.js
 				drawingObjects.push(this);
-			}
+			},
+			multiClick: false
 		}, {
 			name: "Regular Polygon",
 			proto: function(mp, c) {
@@ -88,21 +92,106 @@ function CanvasDrawer(c) {
 				this.color = ToColor(c);
 				drawingObjects.push(this);
 			},
+			multiClick: false,
 			properties: [
-				new (function() {
-					this.displayName = "Edge Count";
-					this.type = "range";
-					this.min = 3;
-					this.max = 30;
-					this.model = polyCount;
-					this.id = "canvasDrawerEdgeCount";
-					this.rangeText = true;
-				})
+				{
+					displayName: "Edge Count",
+					type: "range",
+					min: 3,
+					max: 30,
+					model: polyCount,
+					id: "canvasDrawerEdgeCount",
+					rangeText: true
+				}
 			]
 		}
 	]
 
+	var complexTypes = [
+		{
+			name: "Polygon",
+			proto: function(mp, c) {
+				var first = mp;
+				this.actual = new Polygon(mp);
+				var line = new simpleTypes[0].proto(mp, c);
+				var circle;
+				var close = false;
+				this.update = function(mp) {
+					line.update(mp);
+					var diff = Math.sqrt(Math.pow(first.x - mp.x, 2) + Math.pow(first.y - mp.y, 2));
+					if(diff < 7) {
+						if(circle == null) {
+							// console.log("Here");
+							circle = new simpleTypes[1].proto(first, c);
+							circle.actual.radius(5);
+						}
+						close = true;
+					} else {
+						if(circle != null) {
+							RemoveFromDrawing(circle);
+							circle = null;
+						}
+						close = false;
+					}
+				}
+				this.click = function(mp) {
+					if(close == true) {
+						if(circle != null) {
+							RemoveFromDrawing(circle);
+						}
+						RemoveFromDrawing(line);
+						multiClickOperation = false;
+						currentObject = null;
+						RemoveFromDrawing(this);
+						if(this.actual.PointCount() > 2) {
+							this.actual.Close();
+							DrawPixels(this.actual.pixels(), this.color, backBuffer); // From BasicDrawing.js
+						}
+					} else {
+						this.actual.AddPoint(mp);
+						line.actual.p1(mp);
+					}
+				}
+				this.color = ToColor(c);
+				drawingObjects.push(this);
+			},
+			multiClick: true
+		}, {
+			name: "Bezier Curve",
+			proto: function(mp, c) {
+				this.actual = new BezierCurve(mp);
+				this.update = function(mp) {
+
+				}
+				this.click = function(mp) {
+					this.actual.AddPoint(mp);
+					if(this.actual.PointCount() == 4) {
+						RemoveFromDrawing(this);
+						currentObject = null;
+						multiClickOperation = false;
+						DrawPixels(this.actual.pixels(), this.color, backBuffer); // From BasicDrawing.js
+					}
+				}
+				this.color = ToColor(c);
+				drawingObjects.push(this);
+			},
+			multiClick: true
+		}
+	]
+
+	this.types = simpleTypes.slice();
+	for(var i = 0; i < complexTypes.length; ++i) {
+		this.types.push(complexTypes[i]);
+	}
+
 	var frontBufferEmpty = false;
+
+	function RemoveFromDrawing(obj) {
+		var index = drawingObjects.indexOf(obj);
+		if(index > -1) {
+			drawingObjects.splice(index, 1);
+		}
+	}
 
 	function Draw(timeStamp) {
 
@@ -133,7 +222,9 @@ function CanvasDrawer(c) {
 
 				var t1 = window.performance.now() - t0;
 
+				// console.log(drawingObjects.length);
 				for(var i = 0; i < drawingObjects.length; ++i) {
+					// console.log(drawingObjects[i]);
 					DrawPixels(drawingObjects[i].actual.pixels(), drawingObjects[i].color, frontBuffer); // From BasicDrawing.js
 				}
 
@@ -154,23 +245,36 @@ function CanvasDrawer(c) {
 	}
 
 	window.requestAnimationFrame(Draw);
+	var down = false;
 
 	this.MouseDown = function(mousePoint) {
-		if(currentShape != null) {
-			currentObject = new currentShape.proto(mousePoint, currentColor);
+
+		if(multiClickOperation == true) {
+			down = true;
+		} else {
+			if(currentShape != null) {
+				currentObject = new currentShape.proto(mousePoint, currentColor);
+				multiClickOperation = currentShape.multiClick;
+			}
 		}
+		
 	}
 
 	this.MouseUp = function(mousePoint) {
-		if(currentObject != null) {
-			DrawPixels(currentObject.actual.pixels(), currentObject.color, backBuffer); // From BasicDrawing.js
-			var index = drawingObjects.indexOf(currentObject);
-			// console.log("Removing " + index);
-			if(index > -1) {
-				drawingObjects.splice(index, 1);
+
+		if(multiClickOperation == true) {
+			if(down == true) {
+				currentObject.click(mousePoint);
+				down = false;
 			}
-			currentObject = null;
+		} else {
+			if(currentObject != null) {
+				DrawPixels(currentObject.actual.pixels(), currentObject.color, backBuffer); // From BasicDrawing.js
+				RemoveFromDrawing(currentObject);
+				currentObject = null;
+			}
 		}
+		
 	}
 
 	this.MouseMove = function(mousePoint) {
