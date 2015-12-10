@@ -1,13 +1,14 @@
 
-function BezierCurve(p) {
+function BezierCurve(p, lc) {
 
 	var points = [ p ]
 	var pixels = [];
 	var distance = 0;
+	var lineCount = lc;
 
 	this.Redraw = function() {
 		pixels.length = 0;
-		pixels = CalculateBezierCurve(points, distance, pixels);
+		pixels = CalculateBezierCurve(points, lc, pixels);
 	}
 
 	this.AddPoint = function(p) {
@@ -25,6 +26,17 @@ function BezierCurve(p) {
 
 	this.PointCount = function() {
 		return points.length;
+	}
+
+	this.LineCount = function(lc) {
+
+		if(lc != null) {
+			lineCount = lc;
+			this.Redraw();
+		}
+
+		return lineCount;
+		
 	}
 
 }

@@ -162,6 +162,11 @@ app.controller("mainController", function($scope) {
 		currentShape.state = "border-style: inset";
 		drawer.ChangeShape(index);
 		model.props = currentShape.properties;
+		if(model.props != null) {
+			for(var i = 0; i < model.props. length; ++i) {
+				model.props[i].model.reset();
+			}
+		}
 	}
 
 	$scope.ShapeSelect(0);

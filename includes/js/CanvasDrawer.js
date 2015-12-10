@@ -29,9 +29,21 @@ function CanvasDrawer(c) {
 	var currentObject = null;
 	var currentShape = null;
 	var currentColor = "#000000";
-	var polyCount = { val: 3 };
+	var polyCount = new (function() { 
+		this.val = 3;
+		this.reset = function() { 
+			this.val = 7; 
+		} 
+	})();
+	var curveType = new (function() {
+		this.val = 0;
+		this.reset = function() {
+			this.val = 0;
+		}
+	})
 
 	var multiClickOperation = false;
+	var newFrame = false;
 
 	var simpleTypes = [
 		{
@@ -63,17 +75,37 @@ function CanvasDrawer(c) {
 		}, {
 			name: "Free Hand",
 			proto: function(mp, c) {
-				var pixels = [];
-				this.actual = { pixels: function() { return pixels; } };
-				var lastPoint = mp;
+				if(curveType.val == 0) {
+					this.actual = new FreeHandLine(mp);
+				} else if(curveType.val == 1) {
+					this.actual = new FreeHandCurve(mp);
+				}
 				this.update = function(mp) {
-					pixels = CalculateLine(lastPoint, mp, pixels);
-					lastPoint = mp;
+					if(newFrame == true) {
+						this.actual.AddPoint(mp);
+						newFrame = false;
+					}
 				}
 				this.color = ToColor(c); // From BasicDrawing.js
 				drawingObjects.push(this);
 			},
-			multiClick: false
+			multiClick: false,
+			properties: [
+				{
+					displayName: "Line",
+					type: "radio",
+					value: "0",
+					model: curveType,
+					id: "canvasDrawerLineType",
+				},
+				{
+					displayName: "Bezier",
+					type: "radio",
+					value: "1",
+					model: curveType,
+					id: "canvasDrawerCurveType",
+				},	
+			]
 		}, {
 			name: "Regular Polygon",
 			proto: function(mp, c) {
@@ -159,7 +191,8 @@ function CanvasDrawer(c) {
 		}, {
 			name: "Bezier Curve",
 			proto: function(mp, c) {
-				this.actual = new BezierCurve(mp);
+				console.log(polyCount)
+				this.actual = new BezierCurve(mp, polyCount.val);
 				this.update = function(mp) {
 
 				}
@@ -175,7 +208,18 @@ function CanvasDrawer(c) {
 				this.color = ToColor(c);
 				drawingObjects.push(this);
 			},
-			multiClick: true
+			multiClick: true,
+			properties: [ 
+				{
+					displayName: "Line Count",
+					type: "range",
+					min: 5,
+					max: 200,
+					model: polyCount,
+					id: "canvasDrawerEdgeCount",
+					rangeText: true
+				}
+			]
 		}
 	]
 
@@ -207,6 +251,7 @@ function CanvasDrawer(c) {
 			}
 
 			window.requestAnimationFrame(Draw);
+			newFrame = true;
 
 			if(drawingObjects.length > 0) {
 

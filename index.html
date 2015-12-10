@@ -10,6 +10,7 @@
 		<script type="text/javascript" src="includes/js/CircleDrawing.js"></script>
 		<script type="text/javascript" src="includes/js/PolygonDrawing.js"></script>
 		<script type="text/javascript" src="includes/js/CurveDrawing.js"></script>
+		<script type="text/javascript" src="includes/js/FreeHandDrawing.js"></script>
 		<script type="text/javascript" src="includes/js/CanvasDrawer.js"></script>
 	</head>
 
@@ -22,7 +23,7 @@
 					<label>{{prop.displayName}}:</label>
 					<span ng-show="prop.rangeText" class="propertyRangeText"><input ng-model="prop.model.val"></span>
 					<span>
-						<input class="propertyInput" ng-model="prop.model.val" type="{{prop.type}}" min="{{prop.min}}" max="{{prop.max}}">
+						<input class="propertyInput" ng-model="prop.model.val" type="{{prop.type}}" min="{{prop.min}}" max="{{prop.max}}" value="{{prop.value}}">
 					</span>
 					
 					<!--<output name="test" style="float: right" for="{{prop.id}}"></output>-->

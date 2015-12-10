@@ -185,7 +185,7 @@ function CalculateRegularPolygon(cp, r, e, a, arr) {
 
 	var degreesPerLine = 360 / e;// The amount of degrees on a circle that each section will cover
 	var dplRads = Math.PI * (degreesPerLine / 180); // degreesPerLine in radians
-	var sectionLength = Math.sqrt((2 - (2 * Math.cos(dplRads)))) * r;
+	// var sectionLength = Math.sqrt((2 - (2 * Math.cos(dplRads)))) * r;
 
 	var current = { 
 		x: cp.x - (r * Math.cos(a)), 
@@ -224,7 +224,10 @@ function InternalLerp(p1, p2, t) {
 	p1.y = p1.y + ((p2.y - p1.y) / t);
 }
 
-function CalculateQuadraticCurve(pArr, pc, arr) {
+// Takes a points array, line count and a pixels array, creates a qudratic curve
+// using pArr[0] as a start, pArr[2] as an end, and pArr[1] as a control point,
+// pArr is shorter then 3, a simple line will be created
+function CalculateQuadraticCurve(pArr, lc, arr) {
 
 	var retVal;
 	if(arr == null) {
@@ -243,40 +246,28 @@ function CalculateQuadraticCurve(pArr, pc, arr) {
 	}
 
 	var t = 0;
-	var tStep = 1 / pc;
-	var seg1Len = Math.sqrt(Math.pow(pArr[0].x - pArr[1].x, 2) + Math.pow(pArr[0].y - pArr[1].y, 2));
-	var seg2Len = Math.sqrt(Math.pow(pArr[1].x - pArr[2].x, 2) + Math.pow(pArr[1].y - pArr[2].y, 2));
-	var totalLen = seg1Len + seg2Len;
-	var seg1Ratio = seg1Len / totalLen;
-	var seg2Ratio = seg2Len / totalLen;
-	var seg1T = (tStep / totalLen) * seg1Len;
-	var seg2T = (tStep / totalLen) * seg2Len;
-	var g = (seg1Ratio > seg2Ratio) ? seg1Ratio : seg2Ratio;
+	var tStep = 1 / lc;
+	var prev = { x: Math.floor(pArr[0].x), y: Math.floor(pArr[0].y) };
 
-	var total = 0;
-
-	console.log(seg1Ratio + " / " + seg2Ratio);
-
-	for(var i = 0; t <= 1; ++i) {
+	for(var i = 0; i <= lc; ++i) {
 
 		var x = (Math.pow(1-t, 2) * pArr[0].x) + (2 * (1-t) * t * pArr[1].x) + (Math.pow(t, 2) * pArr[2].x);
 		var y = (Math.pow(1-t, 2) * pArr[0].y) + (2 * (1-t) * t * pArr[1].y) + (Math.pow(t, 2) * pArr[2].y);
-
-		retVal.push(Math.floor(x), Math.floor(y));
-
-		// t += tStep;
-		t += tStep * ((t < seg1Ratio) ? (seg2Ratio / seg1Ratio) : (seg1Ratio / seg2Ratio));
+		var p = { x: Math.floor(x), y: Math.floor(y) };
+		retVal = CalculateLine(prev, p, retVal);
+		t += tStep;
+		prev = p;
 
 	}
-
-	console.log(t);
 
 	return retVal;
 
 }
 
-// Recieves an a array of points, a pixel count and a previuse pixel bufer into which the pixels should be written
-function CalculateBezierCurve(pArr, pc, arr) {
+// Recieves an a array of points, a line count and a pixel buffer into which the pixels should be written
+// Creates a bezier curve using pArr[0] as a start, pArr[3] as an end, and pArr[1] and pArr[2] as control points,
+// if pArr is shorter then 4, a qudratic curve will be created
+function CalculateBezierCurve(pArr, lc, arr) {
 
 	var retVal;
 	if(arr == null) {
@@ -286,13 +277,14 @@ function CalculateBezierCurve(pArr, pc, arr) {
 	}
 
 	if(pArr.length < 4) {
-		return CalculateQuadraticCurve(pArr, pc, retVal);
+		return CalculateQuadraticCurve(pArr, lc, retVal);
 	}
 
 	var t = 0;
-	var tStep = 1 / pc;
+	var tStep = 1 / lc;
+	var prev = { x: Math.floor(pArr[0].x), y: Math.floor(pArr[0].y) };
 
-	for(var i = 0; i <= pc; ++i) {
+	for(var i = 0; i <= lc; ++i) {
 
 		var u = 1 - t;
 		var tt = t*t;
@@ -310,9 +302,12 @@ function CalculateBezierCurve(pArr, pc, arr) {
 		y += 3 * u * tt * pArr[2].y;
 		y += ttt * pArr[3].y;
 		
-		retVal.push(Math.floor(x), Math.floor(y));
+		var p = { x: Math.floor(x), y: Math.floor(y) };
+		retVal = CalculateLine(prev, p, retVal);
 
 		t += tStep;
+		prev = p;
+
 	}
 
 	return retVal;
