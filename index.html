@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html ng-app="graphicsApp">
+<html ng-app="pictureApp">
 	<head>
-		<title>CHANGE THIS</title>
+		<title>Picture Data</title>
 		<link rel = "stylesheet" href = "includes/css/style.css">
-		<script type="text/javascript" src="includes/js/lib/jquery/jquery-2.1.1.min.js"></script>
-		<script type="text/javascript" src="includes/js/lib/angular/angular.min.js"></script>
+		<script type="text/javascript" src="includes/js/lib/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="includes/js/lib/angular.min.js"></script>
+		<script type="text/javascript" src="includes/js/lib/math.min.js"></script>
+		<script type="text/javascript" src="includes/js/lib/FileSaver.min.js"></script>
 		<script type="text/javascript" src="includes/js/BasicDrawing.js"></script>
 		<script type="text/javascript" src="includes/js/LineDrawing.js"></script>
 		<script type="text/javascript" src="includes/js/CircleDrawing.js"></script>
@@ -18,6 +20,16 @@
 		<div class="wrapper">
 			<aside>
 				<button ng-click="ClearCanvas()">Clear</button>
+				<div class="divider"></div>
+				<div class="operationSelect">
+					<button ng-repeat="type in model.shapes" ng-click="OperationSelect($index)" style="{{type.state}}">{{type.name}}</button>
+					<div class="clear"></div>
+				</div>
+				<div class="divider"></div>
+				<div class="operationSelect">
+					<button ng-repeat="type in model.transformations" ng-click="OperationSelect($index + model.shapes.length)" style="{{type.state}}">{{type.name}}</button>
+					<div class="clear"></div>
+				</div>
 				<div class="divider" ng-show="model.props"></div>
 				<div class="propertyBlock" ng-repeat="prop in model.props">
 					<label>{{prop.displayName}}:</label>
@@ -31,16 +43,22 @@
 				</div>
 				<div class="divider"></div>
 				<div class="colorBlock" ng-repeat="color in model.colors" ng-click="ColorSelect($index)" style="background-color: {{color.color}}; {{color.state}}"></div>
+				
 
 			</aside>
 			<main>
-				<div class="selectorBlock">
+				<!--<div class="selectorBlock">
 					<button ng-repeat="type in model.types" ng-click="ShapeSelect($index)" style="{{type.state}}">{{type.name}}</button>
+				</div>-->
+				<input type="file" id="fileBox" style="display: none">
+				<div id="fileButtons">
+					<button id="loadButton">Load</button>
+					<button id="saveButton">Save</button>
 				</div>
 				<div class="divider"></div>
 				<canvas id="canvas" width="710" height="710"></canvas>
 			</main>
 		</div>
-		<script type="text/javascript" src="includes/js/graphicsApp.js"></script>
+		<script type="text/javascript" src="includes/js/pictureApp.js"></script>
 	</body>
 </html>

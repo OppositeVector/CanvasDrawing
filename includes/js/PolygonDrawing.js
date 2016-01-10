@@ -1,35 +1,35 @@
 // Requires BasicDrawing.js
 
-function RegularPolygon(cp, r, e, au) {
+function RegularPolygon(cp, r, e, c) {
 
-	var auto = au;
-	if(auto == null) {
-		auto = false;
-	}
 	var center = cp;
 	var radius = r;
 	var edges = e;
 	var angle = 0;
-	var pixels = [];
+	var points = [];
+	var color = ToColor(c);
+	this.invalid = true;
 
-	this.Redraw = function() {
-
-		pixels.length = 0;
-		pixels = CalculateRegularPolygon(center, radius, edges, angle, pixels);
-
+	this.ReCalc = function() {
+		points = CalculateRegularPolygon(center, radius, edges, angle);
 	}
 
-	this.pixels = function() {
-		return pixels;
+	this.Draw = function(image) {
+		if(points.length > 3) {
+			for(var i = 1; i < points.length; ++i) {
+				DrawLine(points[i-1], points[i], color, image);
+			}
+			DrawLine(points[points.length - 1], points[0], color, image);
+		}
+		this.invalid = false;
 	}
 
 	this.center = function(p) {
 
 		if(p != null) {
 			center = p;
-			if(auto == true) {
-				this.Redraw();
-			}
+			this.ReCalc();
+			this.invalid = true;
 		}
 
 		return center;
@@ -40,9 +40,8 @@ function RegularPolygon(cp, r, e, au) {
 
 		if(r != null) {
 			radius = r;
-			if(auto == true) {
-				this.Redraw();
-			}
+			this.ReCalc();
+			this.invalid = true;
 		}
 
 		return radius;
@@ -53,9 +52,8 @@ function RegularPolygon(cp, r, e, au) {
 
 		if(e != null) {
 			edges = e;
-			if(auto == true) {
-				this.Redraw();
-			}
+			this.ReCalc();
+			this.invalid = true;
 		}
 
 		return edges;
@@ -66,37 +64,37 @@ function RegularPolygon(cp, r, e, au) {
 
 		if(a != null) {
 			angle = a;
-			if(auto == true) {
-				this.Redraw();
-			}
+			this.ReCalc();
+			this.invalid = true;
 		}
 
 		return angle;
 
 	}
 
+	this.ApplyTransformation = function(t) {
+		for(var i = 0; i < points.length; ++i) {
+			points[i] = t(points[i]);
+		}
+		this.invalid = true;
+	}
+
+	this.Serialize = function() {
+		return {
+			type: "polygon",
+			points: points,
+			color: ToHex(color)
+		}
+	}
+
 }
 
-function Polygon(p) {
+function Polygon(p, c) {
 
 	var points = [ p ];
-	var pixels = [];
-
-	this.Redraw = function(close) {
-
-		pixels.length = 0;
-		for(var i = 0; i < (points.length - 1); ++i) {
-			pixels = CalculateLine(points[i], points[i+1], pixels);
-		}
-
-		if(close == true) {
-			pixels = CalculateLine(points[0],points[points.length - 1], pixels);
-		}
-
-		// console.log(points);
-		// console.log(pixels);
-
-	}
+	var color = ToColor(c);
+	this.invalid = true;
+	var close = false;
 
 	this.GetPoint = function(index) {
 		if(index < points.length) {
@@ -107,7 +105,7 @@ function Polygon(p) {
 	this.AddPoint = function(p) {
 
 		points.push(p);
-		this.Redraw(false);
+		this.invalid = true;
 
 	}
 
@@ -116,11 +114,39 @@ function Polygon(p) {
 	}
 
 	this.Close = function(p) {
-		this.Redraw(true);
+		close = true;
+		// this.Redraw(true);
 	}
 
-	this.pixels = function() {
-		return pixels;
+	this.Draw = function(image) {
+		for(var i = 1; i < points.length; ++i) {
+			DrawLine(points[i-1], points[i], color, image);
+		}
+		if(close == true) {
+			DrawLine(points[points.length - 1], points[0], color, image);
+		}
+	}
+
+	this.ApplyTransformation = function(t) {
+		for(var i = 0; i < points.length; ++i) {
+			points[i] = t(points[i]);
+		}
+		this.invalid = true;
+	}
+
+	this.Serialize = function() {
+		return {
+			type: "polygon",
+			points: points,
+			color: ToHex(color)
+		}
+	}
+
+	this.Deserialize = function(obj) {
+		points = obj.points;
+		color = ToColor(obj.color);
+		this.Close();
+		invalid = true;
 	}
 
 }

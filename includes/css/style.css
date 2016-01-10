@@ -169,110 +169,47 @@ input[type="radio"] {
     padding-left:5px;
 }
 
-/* Remnants of the previous style */
-/*
-#loadingOverlay {
-
-	height: 100%;
-	width: 100%;
-	background-color: #000000;
-	position: fixed;
-	z-index: 9999;
-	opacity: 0.4;
-
+#fileButtons {
+	width: 650px;
+	margin: auto;
 }
 
-#loadingOverlay canvas {
-	margin: 0;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-
+#loadButton {
+	width: 300px;
 }
 
-.clear {
-	clear: both;
-}
-
-main {
-	margin-top: 30px;
-	background-color: #7788dd;
-	border-radius: 5px;
-	border-style: solid;
-	border-width: 2px;
-	padding: 15px;
-}
-
-button.remove {
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 19%;
-	background-color: #ec4242;
+#saveButton {
+	width: 300px;
 	float: right;
-	border-color: #b94040;
+}
+
+input[type="file"] {
+	display: block;
+	width: calc(100% - 60px);
+	margin: 20px;
+	padding: 10px;
+	border: 2px solid #5555ff;
 	border-radius: 3px;
+	color: #000000;
 }
 
-button.remove:hover {
-	background-color: #ffa0a0;
-	border-color: #ff2323;
+.operationSelect {
+	padding: 7px;
 }
 
-button.remove:active {
-	background-color: #ffa0a0;
-	border-color: #ff2323;
+.operationSelect button {
+	width: 45%;
+	float: left;
+	margin: 3px;
+	border: 2px outset #b50000;
+	border-radius: 3px;
+	background-color: #f3c3b2;
+}
+
+.operationSelect button:hover {
+	background-color: #ffeccf;
+}
+
+.operationSelect button:active {
 	border-style: inset;
 }
-
-
-input.upload {
-	margin-left: 330px;
-}
-
-article {
-	background-color: #cdeded;
-	height: 32px;
-	padding: 5px;
-	padding-right: 25px;
-	padding-left: 25px;
-	margin: 6px;
-	border-style: solid;
-	border-width: 1px;
-	border-radius: 5px;
-	border-color: #0b4d4c;
-}
-
-article a {
-	width: 79%;
-	height: 100%;
-	color: #0b4d4c;
-}
-
-section {
-
-	padding: 10px;
-	border-style: solid;
-	border-radius: 5px;
-	border-width: 1px;
-
-}
-
-.divider {
-	margin: 15px;
-	padding: 0px;
-	height: 1px;
-	background-image: url("../images/Divider.png");
-	background-size: 100%;
-}
-
-.space {
-	margin-top: 7px;
-	margin-bottom: 7px;
-	height: 1px;
-	background-image: url("../images/LightDivider.png");
-	background-size: 100%;
-}
-
-*/

@@ -1,21 +1,17 @@
 // Requires BasicDrawing.js
 
-function Circle(cp, r) {
+function Circle(cp, r, c) {
 
 	var center = cp;
 	var radius = r;
-	var pixels = [];
-
-	this.Redraw = function() {
-		pixels.length = 0;
-		pixels = CalculateCircle(center, radius, pixels); // From BasicDrawing.js
-	}
+	var color = ToColor(c);
+	this.invalid = true;
 
 	this.center = function(p) {
 
 		if(p != null) {
 			center = p;
-			this.Redraw();
+			this.invalid = true;
 		}
 
 		return center;
@@ -26,15 +22,37 @@ function Circle(cp, r) {
 
 		if(r != null) {
 			radius = r;
-			this.Redraw();
+			this.invalid = true;
 		}
 
 		return radius;
 		
 	}
 
-	this.pixels = function() {
-		return pixels;
+	this.Draw = function(image) {
+		DrawCircle(center, radius, color, image);
+		this.invalid = false;
+	}
+
+	this.ApplyTransformation = function(t) {
+		center = t(center);
+		this.invalid = true;
+	}
+
+	this.Serialize = function() {
+		return {
+			type: "circle",
+			center: center,
+			radius: radius,
+			color: ToHex(color)
+		}
+	}
+
+	this.Deserialize = function(obj) {
+		center = obj.center;
+		radius = obj.radius,
+		color = ToColor(obj.color);
+		invalid = true;
 	}
 
 }

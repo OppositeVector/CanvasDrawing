@@ -1,9 +1,10 @@
-var app = angular.module("graphicsApp",[]);
+var app = angular.module("pictureApp",[]);
 
 var verbose = false;
 
 var model = {
 	types: [],
+	transformations: [],
 	colors: [ 
 		{ color: "#000000" },
 		{ color: "#440000" },
@@ -136,6 +137,8 @@ var model = {
 var canvas = $("#canvas");
 var drawer = new CanvasDrawer(canvas);
 model.types = drawer.types;
+model.shapes = drawer.shapes;
+model.transformations = drawer.transformations;
 
 app.run(function() {
 
@@ -143,33 +146,65 @@ app.run(function() {
 
 var down = false;
 var currentGObject = null;
-var currentShape; // = model.types[0];
-// currentShape.state = "border-style: inset";
+var currentOperation = -1; // = model.types[0];
+// currentOperation.state = "border-style: inset";
 var currentColorObj; // = model.colors[0];
 var colorBoxSelectedStyle = "box-shadow: 0px 0px 4px 7px #ffffff; top: 0px; left: 0px;";
 // currentColorObj.state = colorBoxSelectedStyle;
 var currentColor; // = currentColorObj.color;
+var currentTransformation = null;
+
+var fileBox;
+
+if (window.File && window.FileReader && window.FileList && window.Blob) {
+  	// Great success! All the File APIs are supported.
+  	console.log("File system API available");
+  	fileBox = $("#fileBox");
+  	fileBox.val("");
+  	fileBox.change(function(evt) {
+	  	var files = evt.target.files; // FileList object
+	  	console.log(evt.target.files);
+	  	for(var i = 0; i < evt.target.files.length; ++i) {
+	  		var f = evt.target.files[i];
+	  		var reader = new FileReader();
+	  		reader.onload = function(data) {
+	  			console.log(data.target.result);
+	  			// model.serializedData = data.target.result
+	  			drawer.Clear();
+	  			drawer.RecievePicture(data.target.result);
+	  		}
+	  		reader.readAsText(f);
+	  	}
+  	});
+} else {
+  console.log('The File APIs are not fully supported in this browser.');
+}
 
 app.controller("mainController", function($scope) {
 
 	$scope.model = model;
 
-	$scope.ShapeSelect = function(index) {
-		if(currentShape != null) {
-			currentShape.state = "";
-		}
-		currentShape = model.types[index];
-		currentShape.state = "border-style: inset";
-		drawer.ChangeShape(index);
-		model.props = currentShape.properties;
-		if(model.props != null) {
-			for(var i = 0; i < model.props. length; ++i) {
-				model.props[i].model.reset();
+	$scope.OperationSelect = function(index) {
+		if(index == currentOperation) {
+			model.types[currentOperation].state = "";
+			drawer.ChangeShape(-1);
+			currentOperation = -1;
+			model.props = null;
+		} else {
+			if(currentOperation != -1) {
+				model.types[currentOperation].state = "";
+			}
+			currentOperation = index;
+			model.types[currentOperation].state = "border-style: inset";
+			drawer.ChangeShape(index);
+			model.props = model.types[currentOperation].properties;
+			if(model.props != null) {
+				for(var i = 0; i < model.props. length; ++i) {
+					model.props[i].model.reset();
+				}
 			}
 		}
 	}
-
-	$scope.ShapeSelect(0);
 
 	$scope.ColorSelect = function(index) {
 		if(currentColorObj != null) {
@@ -186,6 +221,28 @@ app.controller("mainController", function($scope) {
 	$scope.ClearCanvas = function() {
 		drawer.Clear();
 	}
+
+	$scope.TransformationSelect = function(index) {
+		if(currentTransformation != null) {
+			currentTransformation.style = "";
+		}
+		currentTransformation = model.transformations[index];
+		currentTransformation.style = "border-style: inset";
+		drawer.ChangeTransformation(index);
+	}
+
+	$("#loadButton").click(function(e) {
+		e.preventDefault();
+        $('#fileBox').click();
+		// drawer.RecievePicture(model.serializedData);
+	});
+
+	$("#saveButton").click(function(e) {
+		e.preventDefault();
+		var data = drawer.SerializePicture();
+		var blob = new Blob([JSON.stringify(data, null, 4)], {type: "application/json"});
+		saveAs(blob, "picture.json");
+	})
 
 	canvas.mousedown(function(event) {
 		if(verbose == true) { 
