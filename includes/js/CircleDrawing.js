@@ -6,6 +6,7 @@ function Circle(cp, r, c) {
 	var radius = r;
 	var color = ToColor(c);
 	this.invalid = true;
+	this.points = [ center ];
 
 	this.center = function(p) {
 
@@ -35,7 +36,7 @@ function Circle(cp, r, c) {
 	}
 
 	this.ApplyTransformation = function(t) {
-		center = t(center);
+		t(center);
 		this.invalid = true;
 	}
 
@@ -53,6 +54,7 @@ function Circle(cp, r, c) {
 		radius = obj.radius,
 		color = ToColor(obj.color);
 		invalid = true;
+		this.points = [ center ];
 	}
 
 }

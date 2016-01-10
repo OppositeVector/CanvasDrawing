@@ -6,20 +6,20 @@ function RegularPolygon(cp, r, e, c) {
 	var radius = r;
 	var edges = e;
 	var angle = 0;
-	var points = [];
+	this.points = [];
 	var color = ToColor(c);
 	this.invalid = true;
 
 	this.ReCalc = function() {
-		points = CalculateRegularPolygon(center, radius, edges, angle);
+		this.points = CalculateRegularPolygon(center, radius, edges, angle);
 	}
 
 	this.Draw = function(image) {
-		if(points.length > 3) {
-			for(var i = 1; i < points.length; ++i) {
-				DrawLine(points[i-1], points[i], color, image);
+		if(this.points.length > 3) {
+			for(var i = 1; i < this.points.length; ++i) {
+				DrawLine(this.points[i-1], this.points[i], color, image);
 			}
-			DrawLine(points[points.length - 1], points[0], color, image);
+			DrawLine(this.points[this.points.length - 1], this.points[0], color, image);
 		}
 		this.invalid = false;
 	}
@@ -74,7 +74,7 @@ function RegularPolygon(cp, r, e, c) {
 
 	this.ApplyTransformation = function(t) {
 		for(var i = 0; i < points.length; ++i) {
-			points[i] = t(points[i]);
+			t(this.points[i]);
 		}
 		this.invalid = true;
 	}
@@ -91,45 +91,44 @@ function RegularPolygon(cp, r, e, c) {
 
 function Polygon(p, c) {
 
-	var points = [ p ];
+	this.points = [ p ];
 	var color = ToColor(c);
 	this.invalid = true;
 	var close = false;
 
 	this.GetPoint = function(index) {
-		if(index < points.length) {
-			return points[index];
+		if(index < this.points.length) {
+			return this.points[index];
 		}
 	}
 
 	this.AddPoint = function(p) {
 
-		points.push(p);
+		this.points.push(p);
 		this.invalid = true;
 
 	}
 
 	this.PointCount = function() {
-		return points.length;
+		return this.points.length;
 	}
 
 	this.Close = function(p) {
 		close = true;
-		// this.Redraw(true);
 	}
 
 	this.Draw = function(image) {
-		for(var i = 1; i < points.length; ++i) {
-			DrawLine(points[i-1], points[i], color, image);
+		for(var i = 1; i < this.points.length; ++i) {
+			DrawLine(this.points[i-1], this.points[i], color, image);
 		}
 		if(close == true) {
-			DrawLine(points[points.length - 1], points[0], color, image);
+			DrawLine(this.points[this.points.length - 1], this.points[0], color, image);
 		}
 	}
 
 	this.ApplyTransformation = function(t) {
-		for(var i = 0; i < points.length; ++i) {
-			points[i] = t(points[i]);
+		for(var i = 0; i < this.points.length; ++i) {
+			t(this.points[i]);
 		}
 		this.invalid = true;
 	}
@@ -137,13 +136,13 @@ function Polygon(p, c) {
 	this.Serialize = function() {
 		return {
 			type: "polygon",
-			points: points,
+			points: this.points,
 			color: ToHex(color)
 		}
 	}
 
 	this.Deserialize = function(obj) {
-		points = obj.points;
+		this.points = obj.points.slice();
 		color = ToColor(obj.color);
 		this.Close();
 		invalid = true;

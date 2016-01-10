@@ -30,7 +30,8 @@ function DrawPixels(pArr, color, image) {
 
 function ClearImage(color, image) {
 
-	for(var i = 0; i < image.data.length; i += 4) {
+	var li = image.data.length;
+	for(var i = 0; i < li; i += 4) {
 		image.data[i] = color.r;
 		image.data[i + 1] = color.g;
 		image.data[i + 2] = color.b;

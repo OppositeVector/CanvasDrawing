@@ -11,9 +11,11 @@ function CanvasDrawer(c) {
 	var height = 0;
 	var invalid = false;
 
+	var white = ToColor("#ffffff");
 	var backBuffer = ctx.createImageData(canvas.width(), canvas.height());
 	var frontBuffer = ctx.createImageData(canvas.width(), canvas.height());
-	var white = ToColor("#ffffff");
+	var clearBuffer = ctx.createImageData(canvas.width(), canvas.height());
+	ClearImage(white, clearBuffer);
 	ClearImage(white, backBuffer); // From BasicDrawing.js
 	ctx.putImageData(backBuffer, 0, 0);
 
@@ -226,7 +228,6 @@ function CanvasDrawer(c) {
 							drawingObjects[i].ApplyTransformation(function(p) {
 								p.x += tx;
 								p.y += ty;
-								return p;
 							});
 						}
 						this.prev = mp;
@@ -240,44 +241,41 @@ function CanvasDrawer(c) {
 				this.orig = mp;
 				var moveOrigin = { x: mp.x * -1, y: mp.y * -1 };
 				var line = new simpleTypes[0].proto(mp, "#ff0000");
+				var a, b, angle, phi, cosPhi, sinPhi, x, y;
 				this.update = function(mp) {
 					line.update(mp);
 					if(this.prev == null) {
-						var a = this.orig.x - mp.x;
-						var b = this.orig.y - mp.y;
+						a = this.orig.x - mp.x;
+						b = this.orig.y - mp.y;
 						if((Math.abs(a) > 50) || (Math.abs(b) > 50)) {
 							this.prev = Math.atan2(b, a);
 							line.actual.color("#00ff00");
 						}
 					} else if((this.prev.x != mp.x) || (this.prev.y != mp.y)) {
-						var a = this.orig.x - mp.x;
-						var b = this.orig.y - mp.y;
-						var angle = Math.atan2(b, a);
-						var phi = this.prev - angle;
-						var cosPhi = Math.cos(phi);
-						var sinPhi = Math.sin(phi);
+						a = this.orig.x - mp.x;
+						b = this.orig.y - mp.y;
+						angle = Math.atan2(b, a);
+						phi = this.prev - angle;
+						cosPhi = Math.cos(phi);
+						sinPhi = Math.sin(phi);
 						// var spinMatrix = math.matrix([
 						// 	[Math.cos(phi), Math.sin(phi), 0],
 						// 	[Math.sin(phi) * -1, Math.cos(phi), 0],
 						// 	[0, 0, 1]
 						// ]);
+						// for(var i = 0; i < drawingObjects.length; ++i) {
+						// 	drawingObjects[i].ApplyTransformation(Trans);
+						// }
 						for(var i = 0; i < drawingObjects.length; ++i) {
 							drawingObjects[i].ApplyTransformation(function(p) {
 								p.x += moveOrigin.x;
 								p.y += moveOrigin.y;
-								var x = p.x;
-								var y = p.y;
+								x = p.x;
+								y = p.y;
 								p.x = (cosPhi * x) + (sinPhi * y);
 								p.y = (-1 * sinPhi * x) + (cosPhi * y);
 								p.x -= moveOrigin.x;
 								p.y -= moveOrigin.y;
-								// var vector = [p.x, p.y, 1];
-								// var res = math.multiply(vector, moveOrigin);
-								// res = math.multiply(res, spinMatrix);
-								// res = math.multiply(res, moveBack);
-								// p.x = res.subset(math.index(0));
-								// p.y = res.subset(math.index(1));
-								return p;
 							});
 						}
 						this.prev = angle;
@@ -311,7 +309,6 @@ function CanvasDrawer(c) {
 							p.y = p.y * sy;
 							p.x -= moveOrigin.x;
 							p.y -= moveOrigin.y;
-							return p;
 						});
 					}
 					this.prev = mp;
@@ -328,9 +325,10 @@ function CanvasDrawer(c) {
 				this.prev = mp;
 				var moveOrigin = { x: mp.x * -1, y: mp.y * -1 };
 				var line = new simpleTypes[0].proto(mp, "#00ff00");
+				var s;
 				this.update = function(mp) {
 					line.update(mp);
-					var s = (canvas.height() - (mp.y - this.prev.y)) / canvas.height();
+					s = (canvas.height() - (mp.y - this.prev.y)) / canvas.height();
 					// var spinMatrix = math.matrix([
 					// 	s, 0, 0],
 					// 	0, s, 0],
@@ -344,7 +342,6 @@ function CanvasDrawer(c) {
 							p.y = p.y * s;
 							p.x -= moveOrigin.x;
 							p.y -= moveOrigin.y;
-							return p;
 						});
 					}
 					this.prev = mp;
@@ -364,7 +361,6 @@ function CanvasDrawer(c) {
 						p.x += moveOrigin.x;
 						p.x = p.x * -1;
 						p.x -= moveOrigin.x;
-						return p;
 					});
 				}
 			}
@@ -379,7 +375,6 @@ function CanvasDrawer(c) {
 						p.y += moveOrigin.y;
 						p.y = p.y * -1;
 						p.y -= moveOrigin.y;
-						return p;
 					});
 				}
 			}
@@ -400,7 +395,6 @@ function CanvasDrawer(c) {
 						for(var i = 0; i < drawingObjects.length; ++i) {
 							drawingObjects[i].ApplyTransformation(function(p) {
 								p.x = p.x + (s * (orig.y - p.y));
-								return p;
 							});
 						}
 						this.prev = m;
@@ -428,7 +422,6 @@ function CanvasDrawer(c) {
 						for(var i = 0; i < drawingObjects.length; ++i) {
 							drawingObjects[i].ApplyTransformation(function(p) {
 								p.y = p.y + (s * (orig.x - p.x));
-								return p;
 							});
 						}
 						this.prev = m;
@@ -488,23 +481,21 @@ function CanvasDrawer(c) {
 			}
 
 			window.requestAnimationFrame(Draw);
-			newFrame = true;
 
 			if(drawingObjects.find(function(ele) { return ele.invalid; }) != null) {
 				invalid = true;
 			}
 
 			if(invalid == true) {
-				// console.log("Redrawing");
-				ClearImage(white, backBuffer);
+				backBuffer.data.set(clearBuffer.data);
 				for(var i = 0; i < drawingObjects.length; ++i) {
 					drawingObjects[i].Draw(backBuffer);
-					// DrawPixels(drawingObjects[i].actual.pixels(), drawingObjects[i].color, frontBuffer); // From BasicDrawing.js
 				}
-				// console.log(backBuffer);
 				ctx.putImageData(backBuffer, 0, 0);
 				invalid = false;
 			}
+
+			newFrame = true;
 
 		});
 

@@ -2,15 +2,23 @@
 
 function Line(p1, p2, c) {
 
-	var point1 = p1;
-	var point2 = p2;
+	var point1 = { x: 0, y: 0 };
+	var point2 = { x: 0, y: 0 };
+	if(p1 != null) {
+		point1 = { x: p1.x, y: p1.y };
+	}
+	if(p2 != null) {
+		point2 = { x: p2.x, y: p2.y };
+	}
 	var color = ToColor(c);
 	this.invalid = true;
+	this.points = [ point1, point2 ];
 
 	this.p1 = function(p) {
 
 		if(p != null) {
-			point1 = p;
+			point1.x = p.x;
+			point1.y = p.y;
 			this.invalid = true;
 		}
 
@@ -21,7 +29,8 @@ function Line(p1, p2, c) {
 	this.p2 = function(p) {
 
 		if(p != null) {
-			point2 = p;
+			point2.x = p.x;
+			point2.y = p.y;
 			this.invalid = true;
 		}
 
@@ -46,8 +55,8 @@ function Line(p1, p2, c) {
 	}
 
 	this.ApplyTransformation = function(t) {
-		point1 = t(point1);
-		point2 = t(point2);
+		t(point1);
+		t(point2);
 		this.invalid = true;
 	}
 
@@ -62,9 +71,10 @@ function Line(p1, p2, c) {
 
 	this.Deserialize = function(obj) {
 		point1 = obj.point1;
-		point2 = obj.point2,
+		point2 = obj.point2;
 		color = ToColor(obj.color);
 		invalid = true;
+		this.points = [ point1, point2 ];
 	}
 
 }

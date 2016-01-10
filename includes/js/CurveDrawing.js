@@ -1,23 +1,23 @@
 
 function BezierCurve(p, lc, c) {
 
-	var points = [ p ]
+	this.points = [ p ]
 	var lineCount = lc;
 	var color = ToColor(c);
 	this.invalid = true;
 
 	this.AddPoint = function(p) {
-		points.push(p);
+		this.points.push(p);
 		this.invalid = true;
 	}
 
 	this.Draw = function(image) {
-		DrawBezierCurve(points, lineCount, color, image);
+		DrawBezierCurve(this.points, lineCount, color, image);
 		invalid = false;
 	}
 
 	this.PointCount = function() {
-		return points.length;
+		return this.points.length;
 	}
 
 	this.LineCount = function(lc) {
@@ -32,8 +32,8 @@ function BezierCurve(p, lc, c) {
 	}
 
 	this.ApplyTransformation = function(t) {
-		for(var i = 0; i < points.length; ++i) {
-			points[i] = t(points[i]);
+		for(var i = 0; i < this.points.length; ++i) {
+			t(this.points[i]);
 		}
 		this.invalid = true;
 	}
@@ -41,13 +41,13 @@ function BezierCurve(p, lc, c) {
 	this.Serialize = function() {
 		return {
 			type: "bezier",
-			points: points,
+			points: this.points,
 			color: ToHex(color)
 		}
 	}
 
 	this.Deserialize = function(obj) {
-		points = obj.points;
+		this.points = obj.points.slice();
 		lineCount = 50;
 		color = ToColor(obj.color);
 		invalid = true;

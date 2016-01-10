@@ -74,6 +74,10 @@ canvas {
 	border-bottom: 2px solid #5500dd;;
 }
 
+canvas:hover {
+	cursor: crosshair;
+}
+
 .divider {
 	margin: 15px;
 	padding: 0px;
@@ -198,9 +202,10 @@ input[type="file"] {
 }
 
 .operationSelect button {
-	width: 45%;
+	width: 44%;
 	float: left;
-	margin: 3px;
+	margin-left: 3%;
+	margin-bottom: 3px;
 	border: 2px outset #b50000;
 	border-radius: 3px;
 	background-color: #f3c3b2;
